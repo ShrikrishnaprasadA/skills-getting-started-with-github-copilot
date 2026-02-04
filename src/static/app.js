@@ -52,8 +52,49 @@ document.addEventListener("DOMContentLoaded", () => {
         if (details.participants && details.participants.length > 0) {
           details.participants.forEach(participant => {
             const li = document.createElement("li");
-            li.textContent = participant;
+            li.style.display = "flex";
+            li.style.alignItems = "center";
             li.style.padding = "2px 0";
+
+            // Participant name
+            const nameSpan = document.createElement("span");
+            nameSpan.textContent = participant;
+            nameSpan.style.flex = "1";
+            li.appendChild(nameSpan);
+
+            // Delete icon
+            const deleteBtn = document.createElement("button");
+            deleteBtn.innerHTML = "&#128465;"; // Trash can emoji
+            deleteBtn.title = "Remove participant";
+            deleteBtn.className = "delete-participant-btn";
+            deleteBtn.style.marginLeft = "10px";
+            deleteBtn.style.background = "none";
+            deleteBtn.style.border = "none";
+            deleteBtn.style.color = "#c62828";
+            deleteBtn.style.cursor = "pointer";
+            deleteBtn.style.fontSize = "1.1em";
+
+            deleteBtn.addEventListener("click", async (e) => {
+              e.stopPropagation();
+              deleteBtn.disabled = true;
+              try {
+                const response = await fetch(
+                  `/activities/${encodeURIComponent(name)}/unregister?email=${encodeURIComponent(participant)}`,
+                  { method: "POST" }
+                );
+                if (response.ok) {
+                  li.remove();
+                } else {
+                  deleteBtn.disabled = false;
+                  alert("Failed to remove participant.");
+                }
+              } catch (err) {
+                deleteBtn.disabled = false;
+                alert("Error removing participant.");
+              }
+            });
+            li.appendChild(deleteBtn);
+
             participantsList.appendChild(li);
           });
         } else {
@@ -100,6 +141,9 @@ document.addEventListener("DOMContentLoaded", () => {
         messageDiv.textContent = result.message;
         messageDiv.className = "success";
         signupForm.reset();
+        // Refresh activities list to show new participant
+        activitySelect.innerHTML = '<option value="">-- Select an activity --</option>';
+        fetchActivities();
       } else {
         messageDiv.textContent = result.detail || "An error occurred";
         messageDiv.className = "error";
