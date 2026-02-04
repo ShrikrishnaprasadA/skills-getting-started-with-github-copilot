@@ -20,12 +20,50 @@ document.addEventListener("DOMContentLoaded", () => {
 
         const spotsLeft = details.max_participants - details.participants.length;
 
+        // Build card content
         activityCard.innerHTML = `
           <h4>${name}</h4>
           <p>${details.description}</p>
           <p><strong>Schedule:</strong> ${details.schedule}</p>
           <p><strong>Availability:</strong> ${spotsLeft} spots left</p>
         `;
+
+        // Participants section
+        const participantsSection = document.createElement("div");
+        participantsSection.className = "participants-section";
+        participantsSection.style.marginTop = "10px";
+        participantsSection.style.background = "#e8f5e9";
+        participantsSection.style.border = "1px solid #a5d6a7";
+        participantsSection.style.borderRadius = "4px";
+        participantsSection.style.padding = "10px";
+
+        const participantsTitle = document.createElement("h5");
+        participantsTitle.textContent = "Participants";
+        participantsTitle.style.margin = "0 0 8px 0";
+        participantsTitle.style.color = "#388e3c";
+        participantsSection.appendChild(participantsTitle);
+
+        const participantsList = document.createElement("ul");
+        participantsList.className = "participants-list";
+        participantsList.style.listStyleType = "disc";
+        participantsList.style.marginLeft = "20px";
+        participantsList.style.color = "#2e7d32";
+
+        if (details.participants && details.participants.length > 0) {
+          details.participants.forEach(participant => {
+            const li = document.createElement("li");
+            li.textContent = participant;
+            li.style.padding = "2px 0";
+            participantsList.appendChild(li);
+          });
+        } else {
+          const li = document.createElement("li");
+          li.textContent = "No participants yet.";
+          li.style.color = "#888";
+          participantsList.appendChild(li);
+        }
+        participantsSection.appendChild(participantsList);
+        activityCard.appendChild(participantsSection);
 
         activitiesList.appendChild(activityCard);
 
